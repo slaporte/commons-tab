@@ -2,6 +2,8 @@
 
 A chrome extension to show cool photos from [Wikimedia Commons](https://commons.wikimedia.org) in Chrome's blank tabs.
 
+You can [install it in the Chrome Web Store](https://chrome.google.com/webstore/detail/commons-tab/afbiobjnggllnimnbhddficgaigcfmcp).
+
 # TODO
 
  - Slideshow settings
