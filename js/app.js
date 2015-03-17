@@ -27,13 +27,14 @@ var default_settings = {
   'Category:Pictures_of_the_Year_(2011)': true,
   'Category:Pictures_of_the_Year_(2012)': true,
   'Category:Pictures_of_the_Year_(2013)': true,
+  'delay': 15000,
   'all_images': []
 }
 
 function get_categories_set() {
   var settings = new Store('settings', default_settings);
   var settings_obj = settings.toObject();
-  excludes = ['all_images'] // settings to exclude from categories, umm...
+  excludes = ['all_images', 'delay'] // settings to exclude from categories, umm...
   ret = [];
   for (var setting in settings_obj) {
     if (settings_obj.hasOwnProperty(setting) && 
@@ -63,7 +64,6 @@ function get_and_store_images(storage_obj, settings, cb) {
   }
   var category_set = get_categories_set();
   var category = category_set[Math.floor(Math.random() * category_set.length)];
-  console.log(category_set)
   var url = 'https://commons.wikimedia.org/w/api.php';
   var params = {
       'action': 'query',
@@ -73,7 +73,7 @@ function get_and_store_images(storage_obj, settings, cb) {
       'cmdir': 'desc',
       'gcmtype': 'file',
       'prop': 'imageinfo',
-      'iiprop': 'url|user',
+      'iiprop': 'url|user|extmetadata',
       'format': 'json',
       'gcmlimit': 25
   }
@@ -83,29 +83,30 @@ function get_and_store_images(storage_obj, settings, cb) {
     url: url,
     data: params,
   }).done(function(data) {
-    console.log(data)
     var images = data['query']['pages'];
     var ret = [];
     for (var id in images) {
       if (images.hasOwnProperty(id)) {
         var image = images[id];
-        if (image['imageinfo'] && image['imageinfo'].length > 0) {
+        if (image['imageinfo'] && image['imageinfo'].length > 0 && image['imageinfo'][0]['extmetadata']['LicenseShortName']) {
           var filename = image['imageinfo'][0]['url'].split(/[\/]+/).pop();
           var parts = image['imageinfo'][0]['url'].split(/commons\//);
           var src = parts[0] + 'commons/thumb/' + parts[1] + '/1440px-' + filename;
-          ret.push({'src': src, 
+          var rights = image['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
+          ret.unshift({'src': src, 
                     'author': image['imageinfo'][0]['user'],
                     'userpage': 'https://commons.wikimedia.org/wiki/User:' + image['imageinfo'][0]['user'],
                     'title': image['title'].replace('File:', '').split(/[\.]+/).shift(),
                     'filepage': image['imageinfo'][0]['descriptionurl'],
+                    'rights': rights,
           });
         }
       }
     }
     var all_imgs = storage_obj['all_images'].concat(ret);
+    shuffle(all_imgs);
     if (all_imgs.length > 50) {
-      shuffle(all_imgs);
-      all_imgs = all_imgs.slice(0, 55);
+      all_imgs = all_imgs.slice(0, 25);
     }
     storage_obj['all_images'] = all_imgs;
     settings.fromObject(storage_obj);
@@ -115,16 +116,22 @@ function get_and_store_images(storage_obj, settings, cb) {
   });
 }
 
-function make_vegas(elem, slides) {
+function make_vegas(elem, config_obj) {
+  var slides = config_obj['all_images'],
+      delay = parseInt(config_obj['delay']);
+
+    console.log(config_obj)
   $(elem).vegas({
     timer: false,
     shuffle: true,
     preload: false,
     color: '#000',
-    delay: 15000,
+    delay: delay,
+    color: '#000',
     slides: slides,
-    transition: ['fade', 'blur'],
-    transitionDuration: 5000,
+    valign: 'top',
+    transition: 'fade',
+    transitionDuration: delay / 3,
     walk: function(index, slide) {
       $('#credits-container').show();
       $('#filename')
@@ -133,6 +140,8 @@ function make_vegas(elem, slides) {
       $('#author')
         .html(slide.author)
         .attr('href', slide.userpage);
+      $('#rights')
+        .html(slide.rights);
     }
   });
 }
@@ -143,7 +152,7 @@ $(function() {
     var settings = new Store('settings', default_settings);
     var img_object = settings.toObject();
     get_and_store_images(img_object, settings, function() {
-      make_vegas('body', img_object['all_images']);  
+      make_vegas('body', img_object);  
     });
   }
 })

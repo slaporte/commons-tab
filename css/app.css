@@ -1,32 +1,64 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700);
+@import url(http://fonts.googleapis.com/css?family=Lato:100); 
+html {
+    height: 100%;
+}
 body {
-    background-color: #000;
+    font-family: 'Open Sans Condensed', sans-serif;
+    background: #000;
     margin: 0;
+    background-image: url(../src/commons-watermark.svg);
+    background-size: 448px 429px;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
 }
-
+ 
 a {
-    color: rgba(159, 184, 249, 0.6);
+    color: rgb(164, 196, 233);
     text-decoration: none;
-    font-weight: 800;
+    font-weight: 700;
 }
+ 
+a#filename {
+    text-transform: capitalize;
+    font-family: 'Lato', serif;
+    font-weight: 100;
+    font-size: 2em;
+}
+ 
 a:hover {
     color: rgb(255, 255, 255);
-    text-decoration: underline;
 }
 
+span#rights {
+    font-size: 0.7em;
+}
+ 
+#rights {
+    font-family: 'Lato', serif;
+    text-align: right;
+}
 #credits-container {
     padding: 1.2em;
-    position: fixed; 
+    position: fixed;
     bottom: 0%;
-    width: 100%; 
-    text-align: right;
-    /*background-color: rgba(52, 73, 94, 0.7); 
+    text-align: left;
+    /*background-color: rgba(52, 73, 94, 0.7);
     border-top: 1px solid rgba(255, 255, 255, 0.5);*/
 }
 
 #credits {
-    padding-right: 1em;
-    font-size: 1.7em;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.6);
-    text-shadow: -2px -2px 2px rgba(0,0,0,0.05), 2px 2px 2px rgba(0,0,0,0.05), 0 0 10px #000;
+    text-transform: uppercase;
+    padding: .5em;
+    font-size: 1.1em;
+    color: rgba(248, 240, 233, 0.7);
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 1px;
+    /*width: 200px;*/
+    /*text-shadow: -2px -2px 2px rgba(0,0,0,0.05), 2px 2px 2px rgba(0,0,0,0.05), 0 0 10px #000;*/
+}
+
+#credits:hover {
+    background-color: rgba(0, 0, 0, 0.9);
 }

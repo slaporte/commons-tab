@@ -1,6 +1,6 @@
 {
   "name": "Commons Tab",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 2,
   "description": "Beautiful free images from Wikimedia Commons for your boring chrome tabs",
   "homepage_url": "https://github.com/slaporte/commons-tab",

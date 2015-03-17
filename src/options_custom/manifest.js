@@ -191,7 +191,15 @@ this.manifest = {
             "name": 'Category:Pictures_of_the_Year_(2013)',
             "type": 'checkbox',
             "label": 'Picture of the year 2013'
-        }
+        },
+        {
+            "tab": 'information',
+            "group": 'Display settings',
+            "name": "delay",
+            "type": "text",
+            "label": 'Time per slide',
+            "text": 'Seconds for each slide'        
+        },
         // {
         //     "tab": 'information',
         //     "group": 'Other categories',
