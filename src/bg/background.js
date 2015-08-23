@@ -1,8 +1,11 @@
 var default_settings = {'delay': 15000,
                         'all_categories': 'Featured pictures of astronomy\nFeatured pictures of fish\nFeatured pictures of Charadriiformes\nFeatured pictures of Passeriformes\nFeatured pictures of Accipitriformes\nFeatured pictures of mammals\nFeatured pictures of architecture\nFeatured pictures of flowers\nFeatured pictures of landscapes\nFeatured night shots\nFeatured pictures of art\nFeatured maps\nFeatured pictures of lighthouses\nFeatured pictures of churches\nFeatured pictures of fortresses\nFeatured pictures of bridges\nFeatured pictures of the International Space Station\nFeatured pictures of rolling stock\nFeatured pictures of motorcycles\nFeatured pictures of ships\nFeatured pictures of aircraft\nPictures of the Year (2008)\nPictures of the Year (2009)\nPictures of the Year (2010)\nPictures of the Year (2011)\nPictures of the Year (2012)\nPictures of the Year (2013)'}
 
-
 function shuffle(array) {
+  /**
+  * Returns a randomly shuffled array.
+  * Copied from here: http://stackoverflow.com/a/2450976
+  */
   var currentIndex = array.length, temporaryValue, randomIndex;
   while (0 !== currentIndex) {
     randomIndex = Math.floor(Math.random() * currentIndex);
@@ -16,6 +19,11 @@ function shuffle(array) {
 }
 
 function convert_image_base64(url, callback, outputFormat){
+    /**
+    * Return a base 64 encoded image based on a URL, so we can
+    *   store it locally.
+    * Copied from here: http://stackoverflow.com/a/20285053
+    */
     var img = new Image();
     img.crossOrigin = 'Anonymous';
     img.onload = function() {
@@ -33,6 +41,9 @@ function convert_image_base64(url, callback, outputFormat){
 }
 
 function get_random_category() {
+  /**
+  * Returns a random category from the extension's local settings.
+  */
   var store = new Store('settings', default_settings);
   var settings = store.toObject();
   var all_categories = settings['all_categories'].split('\n');
@@ -45,6 +56,10 @@ function get_random_category() {
 }
 
 function get_image_infos() {
+  /**
+  * Gets images from a random category and stores the results in
+  *   Chrome.synch storage.
+  */
   var category = get_random_category();
   var url = 'https://commons.wikimedia.org/w/api.php';
   var params = {'action': 'query',
@@ -56,7 +71,7 @@ function get_image_infos() {
                 'prop': 'imageinfo',
                 'iiprop': 'url|user|extmetadata',
                 'format': 'json',
-                'gcmlimit': 100};
+                'gcmlimit': 100}; // TODO: Store in settings?
   var ajax_settings = {'dataType': 'jsonp',
                        'url': url,
                        'data': params}
@@ -89,7 +104,6 @@ function get_image_infos() {
         chrome.storage.sync.set({'images': all_image_infos.slice(1, 10)});
       });
     } catch (e) {
-      console.log(ajax_settings)
       console.log('Could not update the image list')
     }
   });
@@ -97,7 +111,8 @@ function get_image_infos() {
 
 function store_next_image() {
   /**
-  * 
+  * Take the next image from Chrome.sync storage, base 64 encode it, and
+  *   then store it in Chrome.local storage.
   */
   chrome.storage.sync.get('images', function(storage) {
     var all_image_infos = storage['images'] || [];      
@@ -111,12 +126,15 @@ function store_next_image() {
       var more_images = all_image_infos.slice(0, 3);
       var slides = [next_image_info].concat(more_images)
       chrome.storage.local.set({'slides': slides});
-      console.log('saved next image: ' + next_image_info['title'])
+      // console.log('saved next image: ' + next_image_info['title'])
     });
   });
 }
 
 function _show_image_list() {
+  /**
+  * Internal function for debug purposes.
+  */
   chrome.storage.sync.get('images', function(storage) {
     all_image_infos = storage['images'];
     all_image_infos.map(function(info) {
@@ -125,10 +143,17 @@ function _show_image_list() {
   })
 }
 
+/**
+* Get an image set and then store the next image.
+*/
+
 get_image_infos();
 store_next_image();
 
 chrome.runtime.onConnect.addListener(function(port) {
+  /**
+  * Listen for a more message.
+  */
   port.onMessage.addListener(function(msg) {
     if (msg.more) {
       get_image_infos();
