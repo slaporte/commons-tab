@@ -3,6 +3,7 @@
 .vegas-timer,
 .vegas-slide,
 .vegas-slide-inner {
+    background: #000;
     position: absolute;
     top: 0;
     left: 0;
@@ -83,11 +84,13 @@ body.vegas-container {
 .vegas-transition-fade,
 .vegas-transition-fade2 {
     opacity: 0;
+    background-color: #000;
 }
 
 .vegas-transition-fade-in,
 .vegas-transition-fade2-in {
     opacity: 1;
+    background-color: #000;
 }
 
 .vegas-transition-fade2-out {
