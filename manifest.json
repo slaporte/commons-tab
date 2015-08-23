@@ -1,6 +1,6 @@
 {
   "name": "Commons Tab",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "manifest_version": 2,
   "description": "Beautiful free images from Wikimedia Commons for your boring chrome tabs",
   "homepage_url": "https://github.com/slaporte/commons-tab",
@@ -26,6 +26,8 @@
   },
   "content_security_policy":"script-src 'self' https://commons.wikimedia.org; object-src 'self'",
   "permissions": [
+    "storage",
+    "unlimitedStorage",
     "https://commons.wikimedia.org/*"
   ]
 }
