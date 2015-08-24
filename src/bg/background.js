@@ -71,7 +71,7 @@ function get_image_infos() {
                 'prop': 'imageinfo',
                 'iiprop': 'url|user|extmetadata',
                 'format': 'json',
-                'gcmlimit': 100}; // TODO: Store in settings?
+                'gcmlimit': 150}; // TODO: Store in settings?
   var ajax_settings = {'dataType': 'jsonp',
                        'url': url,
                        'data': params}
@@ -101,7 +101,7 @@ function get_image_infos() {
       chrome.storage.sync.get('images', function(storage) {
         var all_image_infos = storage['images'] || [];
         all_image_infos = all_image_infos.concat(ret);
-        chrome.storage.sync.set({'images': all_image_infos.slice(1, 10)});
+        chrome.storage.sync.set({'images': all_image_infos.slice(1, 15)});
       });
     } catch (e) {
       console.log('Could not update the image list')
@@ -119,11 +119,11 @@ function store_next_image() {
     var next_image_info = all_image_infos.shift();
     chrome.storage.sync.get('images', function(storage) {
       // Skip to the next image, in case Commons cannot generate a thumbnail
-      chrome.storage.sync.set({'images': storage['images'].slice(1, 10)});
+      chrome.storage.sync.set({'images': storage['images'].slice(1, 15)});
     });
     convert_image_base64(next_image_info['src'], function(image_data) {
       next_image_info['src'] = image_data;
-      var more_images = all_image_infos.slice(0, 3);
+      var more_images = shuffle(all_image_infos).slice(0, 5);
       var slides = [next_image_info].concat(more_images)
       chrome.storage.local.set({'slides': slides});
       // console.log('saved next image: ' + next_image_info['title'])
@@ -143,12 +143,17 @@ function _show_image_list() {
   })
 }
 
-/**
-* Get an image set and then store the next image.
-*/
-
-get_image_infos();
-store_next_image();
+function setup() {
+  /**
+  * Get an image set and then store the next image.
+  */
+  chrome.storage.sync.get('images', function(storage) {
+    if (storage['images'].length < 10) {
+      get_image_infos();
+    }
+  });
+  store_next_image();
+}
 
 chrome.runtime.onConnect.addListener(function(port) {
   /**
@@ -156,9 +161,11 @@ chrome.runtime.onConnect.addListener(function(port) {
   */
   port.onMessage.addListener(function(msg) {
     if (msg.more) {
-      get_image_infos();
-      store_next_image();
+      setup();
+    } else if (msg.reset) {
+
     }
   });
-
 });
+
+setup();

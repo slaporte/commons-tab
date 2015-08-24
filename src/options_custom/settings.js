@@ -3,9 +3,10 @@ var default_settings = {'delay': 15000,
 
 window.addEvent("domready", function () {
   new FancySettings.initWithManifest(function (settings) {
-    settings.manifest.all_categories.addEvent("action", function (vals) {
-      var port = chrome.runtime.connect({name: 'commons-tab'});
-      port.postMessage({'reset': true});
+    settings.manifest.reset.addEvent("action", function (vals) {
+      var settings = new Store("settings", default_settings);
+      settings.fromObject(default_settings);
+      location.reload();
     });
   });
 });
